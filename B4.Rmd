@@ -1,7 +1,18 @@
-#Load required packages
+---
+title: "B4"
+author: "Nat"
+date: "2023-12-06"
+output: html_document
+---
+```{r}
+library(tidyverse)
+```
+
+# Exercise 1
+
+```{r}
 library(tidytext)
 library(janeaustenr)
-library(tidyverse)
 
 #Choose book
 full.book <- janeaustenr::prideprejudice
@@ -14,7 +25,7 @@ book <- str_replace_all(book, pattern = "\\n", replacement = "") #Remove new lin
 book <- str_replace_all(book, pattern = "[:punct:]", replacement = "") #Remove punctuation
 book <- tolower(book) #words that are in both capital and lowercase will not be double counted
 
-book_df <- tibble(Text = book) #Make tibble for 
+book_df <- tibble(Text = book) #Make tibble for analysis
 
 book_words <- book_df %>% 
     unnest_tokens(output = word, input = Text) 
@@ -22,23 +33,56 @@ book_words <- book_df %>%
 book_words  <- book_words  %>%
     anti_join(stop_words) # Remove stop words 
 
-# Word Counts:
+#Word Counts
   
 book_wordcounts <- book_words  %>% count(word, sort = TRUE)
 use <- slice(book_wordcounts,(1:10))
 use
 
+#Plot data
 ggplot(data = use, aes(y=n, x=word)) +
   geom_col(colour="black",fill="darkslategray4") +
   xlab("word") +
   ylab("times used") +
   ggtitle("Most Used Words - Pride and Prejudice")
+```
 
-set.seed(12)
-word1 <- sample(stringr::words, 20)
-body <- str_sub(word1, -2, -1)
-end <- str_c(str_sub(word1, 1,2), "bat")
-str_c(body,end) 
-body
-word1
+# Assignment 2
+```{r}
+
+fig_latin <- function(word){
+  if(!is.character(word) || length(word) != 1) {
+    stop("input must a single word made of characters")
+  }
+  
+  vowel <- c("a","e","i","o","u")
+  consonant <- c("b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z")
+
+  word <- tolower(word)
+  
+  #maybe adjust arrangement so it's more different from pig latin
+  
+  if (str_sub(word,1,1) %in% vowel) {
+    body <- str_sub(word,2,-1)
+    end <- str_sub(word,1,1)
+    return(paste0("ta",body,"ta",end))
+  }
+  
+  if (str_sub(word,1,1) %in% consonant) {
+    body <- str_sub(word,2,-1)
+    end <- str_sub(word,1,1)
+    return(paste0("at",body,"ta",end))
+  }
+}
+
+fig_latin("charge")
+
+```
+
+
+
+
+
+
+
 
